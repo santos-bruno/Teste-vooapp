@@ -134,7 +134,7 @@ class DanceRenderer {
         items.add((kR[2] + fR[2]) / 2 to { capsule(c, kR, fR, 0.11f * kR[3] * s, 0.08f * fR[3] * s, suit2) })
         items.add(head[2] to {
             val r = 0.24f * head[3] * s
-            fill.shader = RadialGradient(head[0] - r * 0.3f, head[1] - r * 0.4f, r * 0.2f, head[0], head[1], r, intArrayOf(shade(skin, 1.7f), shade(skin, 0.7f)), null, Shader.TileMode.CLAMP)
+            fill.shader = RadialGradient(head[0] - r * 0.3f, head[1] - r * 0.4f, r * 1.2f, shade(skin, 1.7f), shade(skin, 0.7f), Shader.TileMode.CLAMP)
             c.drawCircle(head[0], head[1], r, fill); fill.shader = null
             fill.color = acc; c.drawOval(head[0] - r * 0.7f, head[1] - r * 0.33f, head[0] + r * 0.7f, head[1] + r * 0.23f, fill)
             fill.color = Color.argb(217, 255, 255, 255); c.drawOval(head[0] - r * 0.48f, head[1] - r * 0.18f, head[0] - r * 0.12f, head[1] + r * 0.02f, fill)
