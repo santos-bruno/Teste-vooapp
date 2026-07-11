@@ -1,0 +1,46 @@
+name: Release APK
+
+# Ao criar uma tag de versão (ex.: v1.0.0), compila o APK e publica um
+# Release do GitHub com o .apk anexado para download.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Rename APK with version
+        run: cp app/build/outputs/apk/debug/app-debug.apk "vooapp-${{ github.ref_name }}.apk"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "VooApp ${{ github.ref_name }}"
+          files: "vooapp-${{ github.ref_name }}.apk"
+          generate_release_notes: true
