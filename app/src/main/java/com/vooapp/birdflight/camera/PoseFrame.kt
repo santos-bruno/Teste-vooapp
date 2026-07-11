@@ -21,4 +21,9 @@ data class PoseFrame(
     val hasCore: Boolean
         get() = leftShoulder != null && rightShoulder != null &&
                 leftWrist != null && rightWrist != null
+
+    /** Ombros e pulsos presentes E com alta confiança (dentro do quadro). */
+    val wellTracked: Boolean
+        get() = leftShoulder?.inFrame == true && rightShoulder?.inFrame == true &&
+                leftWrist?.inFrame == true && rightWrist?.inFrame == true
 }

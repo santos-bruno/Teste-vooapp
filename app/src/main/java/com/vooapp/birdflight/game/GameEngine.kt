@@ -67,6 +67,9 @@ class GameEngine {
     // Ambiente
     var timeOfDay = 0.12f; private set
 
+    // Progresso de decolagem (0..1): quanto tempo a pose de voo foi mantida.
+    var takeoffProgress = 0f; private set
+
     val rings = ArrayList<Ring>()
     val obstacles = ArrayList<Obstacle>()
     val powerups = ArrayList<PowerUp>()
@@ -94,7 +97,22 @@ class GameEngine {
         hasShield = false; turboTime = 0f; invuln = 0f
         rings.clear(); obstacles.clear(); powerups.clear()
         spawnCooldown = 0.5f; obstacleCooldown = 3f; powerupCooldown = 8f
-        crashTimer = 0f
+        crashTimer = 0f; takeoffProgress = 0f
+    }
+
+    /** A pose de voo está correta: as duas asas bem rastreadas e abertas/erguidas. */
+    private fun takeoffPoseOk(input: FlightInput) =
+        input.confident && (input.spread > TAKEOFF_SPREAD || input.lift > TAKEOFF_LIFT)
+
+    /** Acumula/decai o progresso de decolagem; retorna true quando pronto. */
+    private fun advanceTakeoff(dt: Float, input: FlightInput): Boolean {
+        if (takeoffPoseOk(input)) {
+            takeoffProgress += dt / TAKEOFF_HOLD
+            if (takeoffProgress >= 1f) { takeoffProgress = 0f; return true }
+        } else {
+            takeoffProgress = (takeoffProgress - dt / (TAKEOFF_HOLD * 0.5f)).coerceAtLeast(0f)
+        }
+        return false
     }
 
     fun update(dt: Float, input: FlightInput) {
@@ -102,14 +120,18 @@ class GameEngine {
         timeOfDay = (timeOfDay + clampedDt / DAY_LENGTH) % 1f
         when (state) {
             GameState.READY -> {
-                if (input.detected && (input.lift > 0.2f || input.flap > 0.3f)) startIfReady()
                 animateFlap(clampedDt, input)
+                // Só decola quando as asas são identificadas corretamente e a
+                // pose de voo é mantida por um instante (evita começar quebrado).
+                if (advanceTakeoff(clampedDt, input)) startIfReady()
             }
             GameState.PLAYING -> updatePlaying(clampedDt, input)
             GameState.CRASHED -> {
                 crashTimer -= clampedDt
                 animateFlap(clampedDt, input)
-                if (crashTimer <= 0f && input.detected && input.lift > 0.1f) { reset(); state = GameState.PLAYING }
+                if (crashTimer <= 0f) {
+                    if (advanceTakeoff(clampedDt, input)) { reset(); state = GameState.PLAYING }
+                } else takeoffProgress = 0f
             }
         }
     }
@@ -302,5 +324,10 @@ class GameEngine {
         private const val TURBO_DURATION = 4.5f
         private const val TURBO_MUL = 1.8f
         private const val INVULN_TIME = 1.2f
+
+        // Decolagem: quanto a pose precisa ser mantida e os limiares da "pose de asas".
+        private const val TAKEOFF_HOLD = 0.7f
+        private const val TAKEOFF_SPREAD = 0.35f
+        private const val TAKEOFF_LIFT = 0.25f
     }
 }

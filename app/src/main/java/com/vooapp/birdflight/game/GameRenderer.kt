@@ -415,7 +415,13 @@ class GameRenderer {
                 dim(canvas, w, h, 120)
                 txt(canvas, "Você caiu!", w / 2f, h * 0.36f, 56f * u, true, Color.WHITE, Paint.Align.CENTER)
                 txt(canvas, "Pontos: ${engine.score}   Recorde: ${engine.best}", w / 2f, h * 0.44f, 24f * u, false, Color.WHITE, Paint.Align.CENTER)
-                txt(canvas, "Levante os braços para voar de novo", w / 2f, h * 0.53f, 22f * u, true, Color.WHITE, Paint.Align.CENTER)
+                val hint = when {
+                    !input.detected -> "Fique visível para a câmera"
+                    !input.confident -> "Mostre os dois braços abertos como asas"
+                    else -> "Segure os braços abertos para voar de novo"
+                }
+                txt(canvas, hint, w / 2f, h * 0.53f, 22f * u, true, if (input.detected && input.confident) Color.WHITE else Color.rgb(255, 180, 120), Paint.Align.CENTER)
+                if (engine.takeoffProgress > 0.01f) drawTakeoffBar(canvas, w, h, u, engine.takeoffProgress)
             }
             GameState.PLAYING -> if (!input.detected) txt(canvas, "Reposicione-se na câmera", w / 2f, h * 0.14f, 22f * u, true, Color.rgb(255, 180, 120), Paint.Align.CENTER)
         }
@@ -437,8 +443,22 @@ class GameRenderer {
             txt(canvas, BirdType.ALL[i].name, cx, cardY + cardH * 0.88f, 17f * u, on, if (on) Color.rgb(255, 224, 138) else Color.WHITE, Paint.Align.CENTER)
         }
         txt(canvas, "Toque para escolher", w / 2f, h * 0.80f, 20f * u, false, Color.argb(230, 255, 255, 255), Paint.Align.CENTER)
-        val hint = if (input.detected) "Abra e levante os braços para decolar" else "Fique visível para a câmera"
-        txt(canvas, hint, w / 2f, h * 0.835f, 22f * u, true, if (input.detected) Color.WHITE else Color.rgb(255, 180, 120), Paint.Align.CENTER)
+        val hint = when {
+            !input.detected -> "Fique visível para a câmera"
+            !input.confident -> "Mostre os dois braços abertos como asas"
+            else -> "Segure os braços abertos para decolar"
+        }
+        txt(canvas, hint, w / 2f, h * 0.835f, 22f * u, true, if (input.detected && input.confident) Color.WHITE else Color.rgb(255, 180, 120), Paint.Align.CENTER)
+        if (engine.takeoffProgress > 0.01f) drawTakeoffBar(canvas, w, h, u, engine.takeoffProgress)
+    }
+
+    private fun drawTakeoffBar(canvas: Canvas, w: Int, h: Int, u: Float, progress: Float) {
+        val bw = w * 0.5f; val bx = w * 0.5f - bw / 2; val by = h * 0.88f; val bh = 14f * u
+        fill.color = Color.argb(130, 0, 0, 0)
+        canvas.drawRoundRect(bx - 3f, by - 3f, bx + bw + 3f, by + bh + 3f, 10f, 10f, fill)
+        fill.color = Color.rgb(120, 230, 140)
+        canvas.drawRoundRect(bx, by, bx + bw * progress.coerceIn(0f, 1f), by + bh, 8f, 8f, fill)
+        txt(canvas, "Decolando…", w / 2f, by - 10f * u, 16f * u, true, Color.rgb(150, 240, 170), Paint.Align.CENTER)
     }
 
     private fun dim(canvas: Canvas, w: Int, h: Int, alpha: Int) { fill.color = Color.argb(alpha, 6, 20, 38); canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), fill) }
