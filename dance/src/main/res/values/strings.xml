@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">JustVoo Dance</string>
+    <string name="camera_permission_rationale">O JustVoo Dance precisa da câmera para acompanhar seus movimentos de dança.</string>
+    <string name="grant_permission">Permitir câmera</string>
+</resources>

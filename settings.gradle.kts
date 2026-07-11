@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "VooApp"
 include(":app")
+include(":dance")
