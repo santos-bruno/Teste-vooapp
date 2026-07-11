@@ -8,6 +8,38 @@ Feito com **Kotlin + CameraX + ML Kit Pose Detection** (o modelo de pose vem
 embutido no app, então funciona **offline**, sem baixar nada em tempo de
 execução) e um motor de jogo 2.5D desenhado em `Canvas`.
 
+## ✨ Destaques
+
+- 🧊 **Visual 3D** — prédios como caixas extrudadas com faces e topo sombreados,
+  chão em grade com perspectiva, argolas como anéis 3D (com furo para
+  atravessar), pássaro volumétrico que rola ao inclinar e névoa no horizonte.
+- 🌅 **Ciclo dia/noite** contínuo — o céu transiciona (amanhecer → dia → pôr
+  do sol → noite), o sol vira lua, estrelas aparecem e a cidade acende as luzes.
+- 🏙️ **Mundo vivo** — cidade com profundidade, rodovia com carros (com faróis
+  à noite), árvores, nuvens e pássaros voando ao fundo.
+- 🎈 **Obstáculos** — balões que fazem você cair; desvie deles!
+- ⚡ **Power-ups** — **Turbo** (mais velocidade + invencibilidade temporária) e
+  **Escudo** (absorve uma batida).
+- 🔊 **Sons sintetizados** — "ding" na argola, som de asas, impacto na queda e
+  jingle ao pegar power-up (gerados em runtime, sem arquivos, funciona offline).
+- 💥 **Efeitos** — brilho, halo e "+pontos" nas argolas; penas e tremor de tela
+  ao cair; linhas de vento e rastro ao planar.
+- 📳 **Vibração** ao pontuar e ao cair.
+- 🏆 **Recorde salvo** entre partidas (SharedPreferences).
+- 📈 **Dificuldade progressiva** — velocidade e obstáculos aumentam com a distância.
+
+## 🐦 Escolha seu pássaro
+
+Na tela inicial você **toca** para escolher entre quatro pássaros, cada um com
+cores e desempenho próprios:
+
+| Pássaro    | Característica                    |
+| ---------- | -------------------------------- |
+| 🦅 Águia   | Mais força para subir            |
+| 🪶 Falcão  | Mais rápido                      |
+| 🦜 Papagaio| Equilibrado                      |
+| 🐦 Arara   | Ágil                             |
+
 ## 🎮 Como jogar
 
 O controle é todo pelo corpo, na frente da câmera:
@@ -59,10 +91,13 @@ app/src/main/java/com/vooapp/birdflight/
 ├── input/
 │   ├── FlightInput.kt           # comandos de voo (lift, flap, roll, spread)
 │   └── PoseInterpreter.kt       # traduz pose -> comandos (com suavização)
+├── audio/
+│   └── SoundFx.kt              # efeitos sonoros sintetizados (AudioTrack)
 └── game/
-    ├── GameEngine.kt            # física do voo, argolas, pontuação, colisão
-    ├── GameRenderer.kt          # desenho pseudo-3D (céu, chão, argolas, pássaro)
-    ├── GameView.kt              # SurfaceView + loop de renderização
+    ├── BirdType.kt              # tipos de pássaro (cores + desempenho)
+    ├── GameEngine.kt            # física, argolas, obstáculos, power-ups, colisão
+    ├── GameRenderer.kt          # cena 3D: cidade, rodovia, dia/noite, efeitos
+    ├── GameView.kt              # SurfaceView + loop + toque + som + vibração + recorde
     └── PoseOverlayView.kt       # esqueleto sobre a prévia da câmera
 ```
 

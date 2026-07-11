@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         analyzer?.close()
         cameraExecutor.shutdown()
+        binding.gameView.releaseAudio()
     }
 
     companion object {
