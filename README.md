@@ -8,6 +8,18 @@ Feito com **Kotlin + CameraX + ML Kit Pose Detection** (o modelo de pose vem
 embutido no app, então funciona **offline**, sem baixar nada em tempo de
 execução) e um motor de jogo 2.5D desenhado em `Canvas`.
 
+## 🐦 Escolha seu pássaro
+
+Na tela inicial você **toca** para escolher entre quatro pássaros, cada um com
+cores e desempenho próprios:
+
+| Pássaro    | Característica                    |
+| ---------- | -------------------------------- |
+| 🦅 Águia   | Mais força para subir            |
+| 🪶 Falcão  | Mais rápido                      |
+| 🦜 Papagaio| Equilibrado                      |
+| 🐦 Arara   | Ágil                             |
+
 ## 🎮 Como jogar
 
 O controle é todo pelo corpo, na frente da câmera:
@@ -60,9 +72,10 @@ app/src/main/java/com/vooapp/birdflight/
 │   ├── FlightInput.kt           # comandos de voo (lift, flap, roll, spread)
 │   └── PoseInterpreter.kt       # traduz pose -> comandos (com suavização)
 └── game/
+    ├── BirdType.kt              # tipos de pássaro (cores + desempenho)
     ├── GameEngine.kt            # física do voo, argolas, pontuação, colisão
-    ├── GameRenderer.kt          # desenho pseudo-3D (céu, chão, argolas, pássaro)
-    ├── GameView.kt              # SurfaceView + loop de renderização
+    ├── GameRenderer.kt          # cena pseudo-3D: cidade, rodovia, árvores, sol, pássaro
+    ├── GameView.kt              # SurfaceView + loop + toque para escolher o pássaro
     └── PoseOverlayView.kt       # esqueleto sobre a prévia da câmera
 ```
 

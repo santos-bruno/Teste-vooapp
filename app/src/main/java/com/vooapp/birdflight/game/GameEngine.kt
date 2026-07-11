@@ -27,6 +27,16 @@ class GameEngine {
     var state = GameState.READY
         private set
 
+    // Seleção de pássaro (na tela inicial)
+    var selectedIndex = 0; private set
+    val bird: BirdType get() = BirdType.ALL[selectedIndex]
+
+    fun selectBird(index: Int) {
+        if (state == GameState.READY || state == GameState.CRASHED) {
+            selectedIndex = index.coerceIn(0, BirdType.ALL.size - 1)
+        }
+    }
+
     // Pássaro
     var lateral = 0f; private set
     private var lateralVel = 0f
@@ -93,7 +103,7 @@ class GameEngine {
         // ---- Vertical ----
         val glide = 1f - 0.55f * input.spread
         val gravity = GRAVITY * glide
-        val liftAccel = input.lift * LIFT_ACCEL + input.flap * FLAP_ACCEL
+        val liftAccel = (input.lift * LIFT_ACCEL + input.flap * FLAP_ACCEL) * bird.liftMul
         vSpeed += (liftAccel - gravity) * dt
         vSpeed *= VERTICAL_DAMPING
         vSpeed = vSpeed.coerceIn(-MAX_VSPEED, MAX_VSPEED)
@@ -109,7 +119,7 @@ class GameEngine {
         bank = (input.roll * 0.7f + lateralVel * 3f).coerceIn(-1f, 1f)
 
         // ---- Avanço ----
-        forwardSpeed = BASE_SPEED + input.spread * SPREAD_SPEED_BONUS
+        forwardSpeed = (BASE_SPEED + input.spread * SPREAD_SPEED_BONUS) * bird.speedMul
         distance += forwardSpeed * dt
 
         // ---- Chão ----

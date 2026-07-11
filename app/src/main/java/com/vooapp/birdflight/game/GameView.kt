@@ -3,6 +3,7 @@ package com.vooapp.birdflight.game
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.vooapp.birdflight.input.FlightInput
@@ -30,6 +31,25 @@ class GameView @JvmOverloads constructor(
     /** Atualiza o comando de voo mais recente (thread-safe). */
     fun updateInput(input: FlightInput) {
         currentInput = input
+    }
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        // Na tela inicial, tocar embaixo escolhe o pássaro (cartões em colunas).
+        if (event.action == MotionEvent.ACTION_DOWN && engine.state == GameState.READY) {
+            if (event.y > height * 0.5f) {
+                val n = BirdType.ALL.size
+                val index = (event.x / (width.toFloat() / n)).toInt().coerceIn(0, n - 1)
+                engine.selectBird(index)
+            }
+            performClick()
+            return true
+        }
+        return super.onTouchEvent(event)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
