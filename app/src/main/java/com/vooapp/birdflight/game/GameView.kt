@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.vooapp.birdflight.audio.SoundFx
 import com.vooapp.birdflight.input.FlightInput
 
 /**
@@ -28,11 +29,19 @@ class GameView @JvmOverloads constructor(
     private var thread: Thread? = null
 
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+    private val sfx = SoundFx()
+    private val prefs = context.getSharedPreferences("vooapp", Context.MODE_PRIVATE)
+    private var savedBest = 0
     private var lastScore = 0
     private var lastState = GameState.READY
+    private var lastFlap = 0f
+    private var lastShield = false
+    private var lastTurbo = false
 
     init {
         holder.addCallback(this)
+        savedBest = prefs.getInt("best", 0)
+        engine.setBest(savedBest)
     }
 
     private fun vibrate(ms: Long, amplitude: Int) {
@@ -82,6 +91,9 @@ class GameView @JvmOverloads constructor(
         thread = null
     }
 
+    /** Libera os recursos de áudio. Chame no onDestroy da Activity. */
+    fun releaseAudio() = sfx.release()
+
     private fun loop() {
         var last = System.nanoTime()
         while (running) {
@@ -92,11 +104,19 @@ class GameView @JvmOverloads constructor(
             val input = currentInput
             engine.update(dt, input)
 
-            // Feedback tátil: leve ao pontuar, forte ao cair.
-            if (engine.score > lastScore) vibrate(28, 90)
-            if (engine.state == GameState.CRASHED && lastState != GameState.CRASHED) vibrate(220, 255)
+            // Som + vibração conforme os eventos do frame.
+            if (engine.score > lastScore) { sfx.ding(); vibrate(28, 90) }
+            if (engine.state == GameState.CRASHED && lastState != GameState.CRASHED) { sfx.thud(); vibrate(220, 255) }
+            if (input.flap > 0.55f && lastFlap <= 0.55f) sfx.whoosh()
+            if ((engine.hasShield && !lastShield) || (engine.turboTime > 0f && !lastTurbo)) sfx.chime()
             lastScore = engine.score
             lastState = engine.state
+            lastFlap = input.flap
+            lastShield = engine.hasShield
+            lastTurbo = engine.turboTime > 0f
+
+            // Persiste o recorde quando ele cresce.
+            if (engine.best > savedBest) { savedBest = engine.best; prefs.edit().putInt("best", savedBest).apply() }
 
             val canvas: Canvas? = holder.lockCanvas()
             if (canvas != null) {

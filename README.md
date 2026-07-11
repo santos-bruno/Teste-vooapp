@@ -10,14 +10,23 @@ execução) e um motor de jogo 2.5D desenhado em `Canvas`.
 
 ## ✨ Destaques
 
+- 🧊 **Visual 3D** — prédios como caixas extrudadas com faces e topo sombreados,
+  chão em grade com perspectiva, argolas como anéis 3D (com furo para
+  atravessar), pássaro volumétrico que rola ao inclinar e névoa no horizonte.
 - 🌅 **Ciclo dia/noite** contínuo — o céu transiciona (amanhecer → dia → pôr
   do sol → noite), o sol vira lua, estrelas aparecem e a cidade acende as luzes.
-- 🏙️ **Mundo vivo** — cidade no horizonte, rodovia com carros em movimento (com
-  faróis à noite), árvores, nuvens e pássaros voando ao fundo.
-- 💥 **Efeitos** — explosão de brilho, halo e "+pontos" ao cruzar as argolas;
-  penas voando e tremor de tela ao cair; linhas de vento e rastro ao planar.
+- 🏙️ **Mundo vivo** — cidade com profundidade, rodovia com carros (com faróis
+  à noite), árvores, nuvens e pássaros voando ao fundo.
+- 🎈 **Obstáculos** — balões que fazem você cair; desvie deles!
+- ⚡ **Power-ups** — **Turbo** (mais velocidade + invencibilidade temporária) e
+  **Escudo** (absorve uma batida).
+- 🔊 **Sons sintetizados** — "ding" na argola, som de asas, impacto na queda e
+  jingle ao pegar power-up (gerados em runtime, sem arquivos, funciona offline).
+- 💥 **Efeitos** — brilho, halo e "+pontos" nas argolas; penas e tremor de tela
+  ao cair; linhas de vento e rastro ao planar.
 - 📳 **Vibração** ao pontuar e ao cair.
-- 📈 **Dificuldade progressiva** — a velocidade aumenta com a distância.
+- 🏆 **Recorde salvo** entre partidas (SharedPreferences).
+- 📈 **Dificuldade progressiva** — velocidade e obstáculos aumentam com a distância.
 
 ## 🐦 Escolha seu pássaro
 
@@ -82,11 +91,13 @@ app/src/main/java/com/vooapp/birdflight/
 ├── input/
 │   ├── FlightInput.kt           # comandos de voo (lift, flap, roll, spread)
 │   └── PoseInterpreter.kt       # traduz pose -> comandos (com suavização)
+├── audio/
+│   └── SoundFx.kt              # efeitos sonoros sintetizados (AudioTrack)
 └── game/
     ├── BirdType.kt              # tipos de pássaro (cores + desempenho)
-    ├── GameEngine.kt            # física do voo, argolas, pontuação, colisão
-    ├── GameRenderer.kt          # cena pseudo-3D: cidade, rodovia, árvores, sol, pássaro
-    ├── GameView.kt              # SurfaceView + loop + toque para escolher o pássaro
+    ├── GameEngine.kt            # física, argolas, obstáculos, power-ups, colisão
+    ├── GameRenderer.kt          # cena 3D: cidade, rodovia, dia/noite, efeitos
+    ├── GameView.kt              # SurfaceView + loop + toque + som + vibração + recorde
     └── PoseOverlayView.kt       # esqueleto sobre a prévia da câmera
 ```
 
