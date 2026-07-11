@@ -8,6 +8,17 @@ Feito com **Kotlin + CameraX + ML Kit Pose Detection** (o modelo de pose vem
 embutido no app, então funciona **offline**, sem baixar nada em tempo de
 execução) e um motor de jogo 2.5D desenhado em `Canvas`.
 
+## ✨ Destaques
+
+- 🌅 **Ciclo dia/noite** contínuo — o céu transiciona (amanhecer → dia → pôr
+  do sol → noite), o sol vira lua, estrelas aparecem e a cidade acende as luzes.
+- 🏙️ **Mundo vivo** — cidade no horizonte, rodovia com carros em movimento (com
+  faróis à noite), árvores, nuvens e pássaros voando ao fundo.
+- 💥 **Efeitos** — explosão de brilho, halo e "+pontos" ao cruzar as argolas;
+  penas voando e tremor de tela ao cair; linhas de vento e rastro ao planar.
+- 📳 **Vibração** ao pontuar e ao cair.
+- 📈 **Dificuldade progressiva** — a velocidade aumenta com a distância.
+
 ## 🐦 Escolha seu pássaro
 
 Na tela inicial você **toca** para escolher entre quatro pássaros, cada um com

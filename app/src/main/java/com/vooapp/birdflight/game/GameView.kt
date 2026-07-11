@@ -2,6 +2,9 @@ package com.vooapp.birdflight.game
 
 import android.content.Context
 import android.graphics.Canvas
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -24,8 +27,22 @@ class GameView @JvmOverloads constructor(
     @Volatile private var running = false
     private var thread: Thread? = null
 
+    private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+    private var lastScore = 0
+    private var lastState = GameState.READY
+
     init {
         holder.addCallback(this)
+    }
+
+    private fun vibrate(ms: Long, amplitude: Int) {
+        val v = vibrator ?: return
+        if (!v.hasVibrator()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(ms, amplitude))
+        } else {
+            @Suppress("DEPRECATION") v.vibrate(ms)
+        }
     }
 
     /** Atualiza o comando de voo mais recente (thread-safe). */
@@ -74,6 +91,12 @@ class GameView @JvmOverloads constructor(
 
             val input = currentInput
             engine.update(dt, input)
+
+            // Feedback tátil: leve ao pontuar, forte ao cair.
+            if (engine.score > lastScore) vibrate(28, 90)
+            if (engine.state == GameState.CRASHED && lastState != GameState.CRASHED) vibrate(220, 255)
+            lastScore = engine.score
+            lastState = engine.state
 
             val canvas: Canvas? = holder.lockCanvas()
             if (canvas != null) {

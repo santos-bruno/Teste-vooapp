@@ -52,6 +52,12 @@ class GameEngine {
     var combo = 0; private set
     var best = 0; private set
 
+    // Ambiente: ciclo dia/noite (0..1), avança sempre.
+    var timeOfDay = 0.12f; private set
+
+    /** Dificuldade 0..1 conforme a distância percorrida. */
+    private fun difficulty() = (distance / 2500f).coerceIn(0f, 1f)
+
     val rings = ArrayList<Ring>()
     private var spawnCooldown = 0f
     private var crashTimer = 0f
@@ -77,6 +83,7 @@ class GameEngine {
 
     fun update(dt: Float, input: FlightInput) {
         val clampedDt = dt.coerceIn(0f, 0.05f)
+        timeOfDay = (timeOfDay + clampedDt / DAY_LENGTH) % 1f
         when (state) {
             GameState.READY -> {
                 // Começa quando o jogador levanta os braços (ou bate as asas).
@@ -118,8 +125,9 @@ class GameEngine {
         if (lateral < -1f) { lateral = -1f; lateralVel = 0f }
         bank = (input.roll * 0.7f + lateralVel * 3f).coerceIn(-1f, 1f)
 
-        // ---- Avanço ----
-        forwardSpeed = (BASE_SPEED + input.spread * SPREAD_SPEED_BONUS) * bird.speedMul
+        // ---- Avanço ---- (acelera conforme a dificuldade)
+        val diff = difficulty()
+        forwardSpeed = (BASE_SPEED + input.spread * SPREAD_SPEED_BONUS) * bird.speedMul * (1f + 0.6f * diff)
         distance += forwardSpeed * dt
 
         // ---- Chão ----
@@ -140,7 +148,7 @@ class GameEngine {
         spawnCooldown -= dt
         if (spawnCooldown <= 0f) {
             spawnRing()
-            spawnCooldown = rng.nextFloat() * 0.8f + SPAWN_INTERVAL
+            spawnCooldown = (rng.nextFloat() * 0.8f + SPAWN_INTERVAL) * (1f - 0.4f * difficulty())
         }
         val it = rings.iterator()
         while (it.hasNext()) {
@@ -186,6 +194,7 @@ class GameEngine {
 
     companion object {
         const val CEILING = 120f
+        private const val DAY_LENGTH = 80f
         private const val START_ALTITUDE = 55f
 
         private const val GRAVITY = 26f
