@@ -72,6 +72,21 @@ A cada push, o GitHub Actions compila o APK de debug automaticamente
 > Precisa estar logado no GitHub para baixar artifacts. Eles ficam
 > disponíveis por alguns dias após cada build.
 
+### Versões estáveis (Releases)
+
+Ao publicar uma **tag de versão** (ex.: `v1.0.0`), o workflow
+`.github/workflows/release.yml` compila e cria um **Release** com o `.apk`
+anexado — que fica disponível permanentemente e sem precisar estar logado.
+Baixe em **Releases** (coluna lateral do repositório) o arquivo
+`vooapp-<versão>.apk`.
+
+Para publicar uma nova versão:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 ## 🏗️ Como compilar
 
 Requer o **Android SDK** (via Android Studio) — o wrapper do Gradle já está
