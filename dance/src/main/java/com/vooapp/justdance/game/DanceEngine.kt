@@ -3,31 +3,55 @@ package com.vooapp.justdance.game
 import kotlin.math.floor
 import kotlin.random.Random
 
-enum class DanceState { READY, PLAYING }
+enum class Screen { MENU, SETUP, COUNTDOWN, PLAYING, TURN_END, RESULTS, RANKING }
 enum class Rating { NONE, ERROU, OK, BOM, PERFEITO }
 
+class Player(val name: String) {
+    var score = 0
+    var stars = 0
+    var matchSum = 0f
+    var matchCount = 0
+}
+
 /**
- * Motor do modo dança: toca uma sequência de passos no ritmo (BPM) e pontua
- * o quanto a pose do jogador combina com o passo atual. Sem renderização.
+ * Motor do GINGA: fluxo completo (menu → seleção → contagem → dança por turnos
+ * → resultado → ranking) e a mecânica de dança (ritmo, passos, nota por acerto).
+ * Sem renderização.
  */
 class DanceEngine {
 
-    var state = DanceState.READY; private set
+    var screen = Screen.MENU; private set
 
+    // Seleção
+    var setupPlayerCount = 1; private set
+    var songIndex = 0; private set
+    val song: Song get() = Song.ALL[songIndex]
+
+    // Jogadores / turnos
+    val players = ArrayList<Player>()
+    var currentPlayerIndex = 0; private set
+    val currentPlayer: Player? get() = players.getOrNull(currentPlayerIndex)
+
+    // Ranking (preenchido pela View a partir do Leaderboard)
+    var rankingEntries: List<ScoreEntry> = emptyList()
+
+    // Passo atual da dança
     var currentMove: Move = Move.ALL[0]; private set
     var nextMove: Move = Move.ALL[1]; private set
 
+    // Estado da corrida atual
     var score = 0; private set
     var combo = 0; private set
-    var groove = 0.5f; private set          // "medidor de gingado" 0..1
-    var liveMatch = 0f; private set          // acerto ao vivo 0..1
+    var groove = 0.5f; private set
+    var liveMatch = 0f; private set
     var lastRating = Rating.NONE; private set
-    var ratingTimer = 0f; private set        // tempo restante do popup de nota
-    var ratingCount = 0; private set         // incrementa a cada nota dada
-    var moveProgress = 0f; private set       // 0..1 dentro do passo atual
-    var beatPulse = 0f; private set          // 1 na batida, decai até 0
-    var beatCount = 0; private set           // incrementa a cada batida
-    var startProgress = 0f; private set      // prontidão para começar
+    var ratingTimer = 0f; private set
+    var ratingCount = 0; private set
+    var moveProgress = 0f; private set
+    var beatPulse = 0f; private set
+    var beatCount = 0; private set
+    var movesDone = 0; private set
+    var countdown = 0f; private set
 
     private var songTime = 0f
     private var lastBeat = -1
@@ -35,44 +59,74 @@ class DanceEngine {
     private var bestMatch = 0f
     private val rng = Random(System.nanoTime())
 
-    fun update(dt: Float, features: FloatArray?, fullBody: Boolean) {
-        val d = dt.coerceIn(0f, 0.05f)
-        if (ratingTimer > 0f) ratingTimer -= d
-        when (state) {
-            DanceState.READY -> {
-                if (fullBody) { startProgress += d / START_HOLD; if (startProgress >= 1f) start() }
-                else startProgress = (startProgress - d / (START_HOLD * 0.5f)).coerceAtLeast(0f)
-            }
-            DanceState.PLAYING -> updatePlaying(d, features)
-        }
+    val songProgress: Float get() = (movesDone.toFloat() / song.moves).coerceIn(0f, 1f)
+
+    // -------------------------------------------------------- navegação (toque)
+
+    fun tapPlay() { if (screen == Screen.MENU) screen = Screen.SETUP }
+    fun tapRanking() { if (screen == Screen.MENU) screen = Screen.RANKING }
+    fun tapBackToMenu() { screen = Screen.MENU }
+    fun setPlayers(n: Int) { if (screen == Screen.SETUP) setupPlayerCount = n.coerceIn(1, 4) }
+    fun selectSong(i: Int) { if (screen == Screen.SETUP) songIndex = i.coerceIn(0, Song.ALL.size - 1) }
+
+    fun startGame() {
+        if (screen != Screen.SETUP) return
+        players.clear()
+        for (i in 0 until setupPlayerCount) players.add(Player("P${i + 1}"))
+        currentPlayerIndex = 0
+        beginTurn()
     }
 
-    private fun start() {
-        state = DanceState.PLAYING
+    /** Avança do TURN_END para o próximo jogador ou para os resultados. */
+    fun tapContinue() {
+        if (screen != Screen.TURN_END) return
+        if (currentPlayerIndex < players.size - 1) { currentPlayerIndex++; beginTurn() }
+        else screen = Screen.RESULTS
+    }
+
+    private fun beginTurn() {
+        screen = Screen.COUNTDOWN
+        countdown = 3.2f
+        score = 0; combo = 0; groove = 0.5f; movesDone = 0
         songTime = 0f; lastBeat = -1; moveNumber = 0; bestMatch = 0f
-        score = 0; combo = 0; groove = 0.5f
+        lastRating = Rating.NONE; ratingTimer = 0f
         currentMove = Move.ALL[rng.nextInt(Move.ALL.size)]
         nextMove = pickDifferent(currentMove)
     }
 
+    // -------------------------------------------------------- update
+
+    fun update(dt: Float, features: FloatArray?, fullBody: Boolean) {
+        val d = dt.coerceIn(0f, 0.05f)
+        if (ratingTimer > 0f) ratingTimer -= d
+        when (screen) {
+            Screen.COUNTDOWN -> { countdown -= d; if (countdown <= 0f) screen = Screen.PLAYING }
+            Screen.PLAYING -> updatePlaying(d, features)
+            else -> {}
+        }
+    }
+
     private fun updatePlaying(dt: Float, features: FloatArray?) {
+        val beatLen = 60f / song.bpm
         songTime += dt
-        val beatPos = songTime / BEAT_LEN
+        val beatPos = songTime / beatLen
         val beat = floor(beatPos).toInt()
-        val phase = beatPos - beat
-        beatPulse = (1f - phase).toFloat().coerceIn(0f, 1f)
+        val phase = (beatPos - beat).toFloat()
+        beatPulse = (1f - phase).coerceIn(0f, 1f)
         if (beat != lastBeat) { lastBeat = beat; beatCount++ }
 
-        // Acerto ao vivo com o passo atual.
         liveMatch = if (features != null) Move.score(features, currentMove) else liveMatch * 0.9f
         if (liveMatch > bestMatch) bestMatch = liveMatch
 
-        val thisMoveNumber = beat / BEATS_PER_MOVE
-        moveProgress = ((beat % BEATS_PER_MOVE) + phase).toFloat() / BEATS_PER_MOVE
+        val bpm = song.beatsPerMove
+        moveProgress = ((beat % bpm) + phase) / bpm
+        val thisMoveNumber = beat / bpm
         if (thisMoveNumber != moveNumber) {
             commitRating(bestMatch)
             moveNumber = thisMoveNumber
             bestMatch = 0f
+            movesDone++
+            if (movesDone >= song.moves) { finishTurn(); return }
             currentMove = nextMove
             nextMove = pickDifferent(currentMove)
         }
@@ -88,9 +142,16 @@ class DanceEngine {
         if (rating == Rating.ERROU) combo = 0 else combo += 1
         score += (points * (1f + combo * 0.1f)).toInt()
         groove = (groove + (best - 0.5f) * 0.4f).coerceIn(0f, 1f)
-        lastRating = rating
-        ratingTimer = RATING_SHOW
-        ratingCount++
+        lastRating = rating; ratingTimer = RATING_SHOW; ratingCount++
+        currentPlayer?.let { it.matchSum += best; it.matchCount++ }
+    }
+
+    private fun finishTurn() {
+        val p = currentPlayer ?: return
+        p.score = score
+        val avg = if (p.matchCount > 0) p.matchSum / p.matchCount else 0f
+        p.stars = when { avg >= 0.85f -> 5; avg >= 0.72f -> 4; avg >= 0.58f -> 3; avg >= 0.42f -> 2; else -> 1 }
+        screen = Screen.TURN_END
     }
 
     private fun pickDifferent(m: Move): Move {
@@ -99,11 +160,8 @@ class DanceEngine {
         return c
     }
 
-    companion object {
-        private const val BPM = 100f
-        private const val BEAT_LEN = 60f / BPM
-        private const val BEATS_PER_MOVE = 4
-        private const val START_HOLD = 1.0f
-        private const val RATING_SHOW = 1.1f
-    }
+    /** Jogadores ordenados por pontuação (para a tela de resultados). */
+    fun ranked(): List<Player> = players.sortedByDescending { it.score }
+
+    companion object { private const val RATING_SHOW = 1.1f }
 }

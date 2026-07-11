@@ -8,7 +8,8 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.vooapp.justdance"
+        // App novo (GINGA) — applicationId próprio: instala separado, sem conflito.
+        applicationId = "com.vooapp.ginga"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
