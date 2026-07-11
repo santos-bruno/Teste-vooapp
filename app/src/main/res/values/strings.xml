@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VooApp</string>
+    <string name="camera_permission_rationale">O VooApp precisa da câmera para detectar seus movimentos e transformá-los em voo.</string>
+    <string name="grant_permission">Permitir câmera</string>
+</resources>
