@@ -58,6 +58,20 @@ O controle é todo pelo corpo, na frente da câmera:
 - Fique visível para a câmera; o esqueleto no canto mostra o que está sendo
   rastreado (o ponto no canto inferior fica verde quando há rastreio).
 
+## 📥 Baixar o APK pronto (sem Android Studio)
+
+A cada push, o GitHub Actions compila o APK de debug automaticamente
+(workflow em `.github/workflows/build-apk.yml`). Para pegar o APK:
+
+1. Abra a aba **Actions** do repositório no GitHub.
+2. Clique na execução mais recente do fluxo **Build APK** (marca verde ✓).
+3. Em **Artifacts**, baixe **`vooapp-debug-apk`** (um `.zip` com o `app-debug.apk`).
+4. Transfira o `app-debug.apk` para o celular e instale (permita
+   "instalar de fontes desconhecidas").
+
+> Precisa estar logado no GitHub para baixar artifacts. Eles ficam
+> disponíveis por alguns dias após cada build.
+
 ## 🏗️ Como compilar
 
 Requer o **Android SDK** (via Android Studio) — o wrapper do Gradle já está
