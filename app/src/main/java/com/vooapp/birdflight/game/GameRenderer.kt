@@ -256,7 +256,7 @@ class GameRenderer {
             val cx = vpX + (w * 0.5f - vpX) * tt + tr.side * (roadHalf + tr.off * w * (0.4f + tt)); val sc = (0.25f + tt * 1.1f) * u
             fill.color = Color.argb(46, 0, 0, 0); canvas.drawOval(cx - 12f * sc, y - 4f * sc, cx + 12f * sc, y + 4f * sc, fill)
             fill.color = if (night > 0.5f) Color.rgb(58, 42, 24) else Color.rgb(107, 74, 43); canvas.drawRect(cx - 3f * sc, y - 16f * sc, cx + 3f * sc, y, fill)
-            fill.shader = RadialGradient(cx - 5f * sc, y - 26f * sc, 2f, cx, y - 20f * sc, 18f * sc, intArrayOf(lerpColor(Color.rgb(74, 168, 90), Color.rgb(32, 80, 46), gt), lerpColor(Color.rgb(42, 109, 56), Color.rgb(18, 53, 31), gt)), null, Shader.TileMode.CLAMP)
+            fill.shader = RadialGradient(cx - 4f * sc, y - 24f * sc, 20f * sc, lerpColor(Color.rgb(74, 168, 90), Color.rgb(32, 80, 46), gt), lerpColor(Color.rgb(42, 109, 56), Color.rgb(18, 53, 31), gt), Shader.TileMode.CLAMP)
             canvas.drawCircle(cx, y - 22f * sc, 14f * sc, fill); canvas.drawCircle(cx - 10f * sc, y - 16f * sc, 10f * sc, fill); canvas.drawCircle(cx + 10f * sc, y - 16f * sc, 10f * sc, fill); fill.shader = null
         }
     }
@@ -302,7 +302,7 @@ class GameRenderer {
             // Cordinha
             stroke.color = Color.argb(160, 60, 60, 60); stroke.strokeWidth = max(1f, 1.5f * p[2] * u); canvas.drawLine(sx, sy + rr, sx, sy + rr * 2.4f, stroke)
             // Balão (esfera vermelha com brilho)
-            fill.shader = RadialGradient(sx - rr * 0.35f, sy - rr * 0.4f, rr * 0.15f, sx, sy, rr, intArrayOf(Color.rgb(255, 140, 130), Color.rgb(214, 40, 40), Color.rgb(150, 20, 20)), floatArrayOf(0f, 0.6f, 1f), Shader.TileMode.CLAMP)
+            fill.shader = RadialGradient(sx - rr * 0.3f, sy - rr * 0.35f, rr * 1.25f, intArrayOf(Color.rgb(255, 140, 130), Color.rgb(214, 40, 40), Color.rgb(150, 20, 20)), floatArrayOf(0f, 0.6f, 1f), Shader.TileMode.CLAMP)
             canvas.drawCircle(sx, sy, rr, fill); fill.shader = null
             fill.color = Color.argb(150, 255, 255, 255); canvas.drawOval(sx - rr * 0.5f, sy - rr * 0.6f, sx - rr * 0.1f, sy - rr * 0.2f, fill)
             // Bico do balão
@@ -352,9 +352,9 @@ class GameRenderer {
             stroke.color = bird.edge; stroke.strokeWidth = 2f
             for (i in 1..4) { val t = i / 5f; canvas.drawLine(s * (24f + 60f * t * sp), 6f - up * 0.4f * t, s * (140f * sp * t + 18f), -4f - up * 0.5f, stroke) }
         }
-        fill.shader = RadialGradient(-7f, -6f, 3f, 0f, 6f, 36f, intArrayOf(shade(bird.wing, 1.4f), bird.body, shade(bird.body, 0.7f)), floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP)
+        fill.shader = RadialGradient(-7f, -4f, 42f, intArrayOf(shade(bird.wing, 1.4f), bird.body, shade(bird.body, 0.7f)), floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP)
         canvas.drawOval(-20f, -26f, 20f, 38f, fill); fill.shader = null
-        fill.shader = RadialGradient(-5f, -32f, 2f, 0f, -28f, 16f, intArrayOf(shade(bird.head, 1.2f), shade(bird.head, 0.82f)), null, Shader.TileMode.CLAMP)
+        fill.shader = RadialGradient(-5f, -32f, 17f, shade(bird.head, 1.2f), shade(bird.head, 0.82f), Shader.TileMode.CLAMP)
         canvas.drawCircle(0f, -28f, 15f, fill); fill.shader = null
         fill.color = bird.beak; canvas.drawPath(Path().apply { moveTo(-6f, -40f); lineTo(0f, -56f); lineTo(6f, -40f); close() }, fill)
         fill.color = Color.rgb(22, 22, 22); canvas.drawCircle(-7f, -30f, 2.6f, fill); canvas.drawCircle(7f, -30f, 2.6f, fill)
@@ -378,7 +378,7 @@ class GameRenderer {
         // Bolha de escudo
         if (engine.hasShield) {
             val pulse = 0.9f + 0.1f * sin(engine.distance * 0.2f)
-            fill.shader = RadialGradient(bx, by, 40f * u, 66f * u * pulse, intArrayOf(Color.argb(0, 90, 200, 255), Color.argb(60, 90, 200, 255), Color.argb(120, 140, 220, 255)), floatArrayOf(0.6f, 0.85f, 1f), Shader.TileMode.CLAMP)
+            fill.shader = RadialGradient(bx, by, 66f * u * pulse, intArrayOf(Color.argb(0, 90, 200, 255), Color.argb(60, 90, 200, 255), Color.argb(120, 140, 220, 255)), floatArrayOf(0.6f, 0.85f, 1f), Shader.TileMode.CLAMP)
             canvas.drawCircle(bx, by, 66f * u * pulse, fill); fill.shader = null
             stroke.color = Color.argb(200, 150, 225, 255); stroke.strokeWidth = 2.5f * u; canvas.drawCircle(bx, by, 66f * u * pulse, stroke)
         }
