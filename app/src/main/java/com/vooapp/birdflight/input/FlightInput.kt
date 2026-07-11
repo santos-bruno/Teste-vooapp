@@ -15,6 +15,12 @@ data class FlightInput(
     val roll: Float = 0f,
     /** Abertura das asas (braços esticados): 0 (encolhido) .. 1 (planando esticado). */
     val spread: Float = 0f,
+    /**
+     * true quando os dois ombros e os dois pulsos estão bem rastreados (alta
+     * confiança) — ou seja, as "asas" foram identificadas corretamente.
+     * Usado como pré-requisito para a decolagem.
+     */
+    val confident: Boolean = false,
 ) {
     companion object {
         val IDLE = FlightInput()

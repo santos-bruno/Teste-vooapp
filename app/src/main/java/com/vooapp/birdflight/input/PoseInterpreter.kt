@@ -49,6 +49,7 @@ class PoseInterpreter {
                 flap = smoothedFlap,
                 roll = smoothedRoll,
                 spread = smoothedSpread,
+                confident = false,
             )
         }
 
@@ -104,6 +105,7 @@ class PoseInterpreter {
             flap = smoothedFlap,
             roll = smoothedRoll,
             spread = smoothedSpread,
+            confident = frame.wellTracked,
         )
     }
 
