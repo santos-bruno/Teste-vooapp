@@ -40,6 +40,15 @@ class Move(
             Move("Descansar",
                 floatArrayOf(-0.9f, 0.6f, 0.0f, 0.9f, 3.0f), floatArrayOf(1f, 0.5f, 0.4f, 0.3f, 0.3f),
                 floatArrayOf(-0.35f, 0.9f), floatArrayOf(0.35f, 0.9f), floatArrayOf(-0.3f, 2.0f), floatArrayOf(0.3f, 2.0f)),
+            Move("Mão direita pro céu",
+                floatArrayOf(0.4f, 1.2f, 1.7f, 0.9f, 3.0f), floatArrayOf(0.5f, 0.4f, 1.3f, 0.3f, 0.3f),
+                floatArrayOf(-0.75f, 0.55f), floatArrayOf(0.4f, -0.95f), floatArrayOf(-0.3f, 2.0f), floatArrayOf(0.3f, 2.0f)),
+            Move("Chute lateral",
+                floatArrayOf(0.3f, 1.8f, 0.9f, 1.9f, 2.4f), floatArrayOf(0.4f, 0.8f, 0.8f, 1.2f, 0.8f),
+                floatArrayOf(-0.9f, -0.3f), floatArrayOf(0.55f, 0.45f), floatArrayOf(-0.25f, 2.0f), floatArrayOf(0.95f, 1.7f)),
+            Move("Mãos no alto",
+                floatArrayOf(1.5f, 0.6f, 0.0f, 0.9f, 3.0f), floatArrayOf(1.3f, 0.9f, 0.5f, 0.3f, 0.3f),
+                floatArrayOf(-0.18f, -1.05f), floatArrayOf(0.18f, -1.05f), floatArrayOf(-0.3f, 2.0f), floatArrayOf(0.3f, 2.0f)),
         )
 
         /** Similaridade 0..1 entre as características do jogador e o passo. */

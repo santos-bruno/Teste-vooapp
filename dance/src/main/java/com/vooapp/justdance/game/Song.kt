@@ -17,6 +17,7 @@ class Song(
             Song("Neon Nights", 100f, 4, 315, 0, 16),
             Song("Cyber Samba", 118f, 4, 190, 1, 18),
             Song("Sunset Drive", 92f, 4, 30, 2, 14),
+            Song("Baile Estelar", 105f, 4, 265, 3, 16),
         )
     }
 }
